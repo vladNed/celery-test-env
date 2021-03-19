@@ -7,5 +7,5 @@ all:
 	- $(ENV_ACTIVATE)
 	- ${PYTHON} -m pip install -r requirements.txt
 	- sudo apt-get install rabbitmq-server
-	- docker run -d -p 4200:4200 rabbitmq
+	- docker run -d -p 5672:5672 rabbitmq
 	- docker run -d -p 6379:6379 redis
