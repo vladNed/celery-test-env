@@ -1,32 +1,24 @@
-from tasks import add
-from celery import group, signature
-from celery.result import states
+import tasks
 import time
 
-result = group([
-    signature(
-        'tasks.add',
-        kwargs={
-            'volume': 645,
-            'data': 10
-        },
-        immutable=True
-    ),
-    signature(
-        'tasks.add',
-        kwargs={
-            'volume': 785,
-            'data': 2
-        },
-        immutable=True
-    )
-])
-async_stuff = result.apply_async()
-state = [i.state == states.PENDING for i in async_stuff.results]
-while any(state):
-    time.sleep(2)
-    print('..wating')
-    state = [i.state == states.PENDING for i in async_stuff.results]
+task = tasks.app.send_task(
+    name="tasks.generate_password",
+    kwargs={
+        "section": 200,
+        "name": "vladNed"
+    }
+)
 
+count = 0
+print("> START - Starting password generation")
+while count < 10:
+    if task.successful():
+        print(f"> SUCCESS - result: {task.result}")
+        break
+    else:
+        print(f"> WAIT - count: {count}")
+        time.sleep(2)
+        count += 1
 
-print(async_stuff.get())
+if count >= 10:
+    print("> FAILED !!!!!!!!")
